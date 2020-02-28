@@ -2,6 +2,8 @@
 
 This a filter plug-in for the [Glyphs font editor](http://glyphsapp.com/) for reproducing a shadow that looks like the old Chicago Shadowed pixelfonts by Susan Kare that came bundled with the old Mac System 7.
 
+![System7Shadow](System7Shadow.png)
+
 ### Installation
 
 1. One-click install *System 7 Shadow* from *Window > Plugin Manager*
