@@ -189,7 +189,9 @@ class System7Shadow(FilterWithDialog):
 		originalLSB = layer.LSB
 		originalRSB = layer.RSB
 		
+		layer.decomposeComponents()
 		layer.removeOverlap()
+		layer.cleanUpPaths()
 		
 		for fatPath in fatLayer.paths:
 			layer.paths.append(fatPath.copy())
