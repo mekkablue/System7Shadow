@@ -1,4 +1,5 @@
 # encoding: utf-8
+from __future__ import division, print_function, unicode_literals
 
 ###########################################################################################################
 #
@@ -22,18 +23,29 @@ from GlyphsApp.plugins import *
 from AppKit import NSAffineTransform, NSAffineTransformStruct
 from Foundation import NSClassFromString
 
+@objc.python_method
 def offsetLayer( thisLayer, offsetX, offsetY, makeStroke=False, position=0.5, autoStroke=False ):
 	offsetFilter = NSClassFromString("GlyphsFilterOffsetCurve")
-	offsetFilter.offsetLayer_offsetX_offsetY_makeStroke_autoStroke_position_error_shadow_(
-		thisLayer,
-		offsetX, offsetY, # horizontal and vertical offset
-		makeStroke,       # if True, creates a stroke
-		autoStroke,       # if True, distorts resulting shape to vertical metrics
-		position,         # stroke distribution to the left and right, 0.5 = middle
-		None, None )
+	try:
+		# GLYPHS 3:	
+		offsetFilter.offsetLayer_offsetX_offsetY_makeStroke_autoStroke_position_metrics_error_shadow_capStyleStart_capStyleEnd_keepCompatibleOutlines_(
+			thisLayer,
+			offsetX, offsetY, # horizontal and vertical offset
+			makeStroke,     # if True, creates a stroke
+			autoStroke,     # if True, distorts resulting shape to vertical metrics
+			position,       # stroke distribution to the left and right, 0.5 = middle
+			None, None, None, 0, 0, False )
+	except:
+		# GLYPHS 2:
+		offsetFilter.offsetLayer_offsetX_offsetY_makeStroke_autoStroke_position_error_shadow_(
+			thisLayer,
+			offset, offset, # horizontal and vertical offset
+			makeStroke,     # if True, creates a stroke
+			autoStroke,     # if True, distorts resulting shape to vertical metrics
+			position,       # stroke distribution to the left and right, 0.5 = middle
+			None, None )
 
-
-
+@objc.python_method
 def transform(shiftX=0.0, shiftY=0.0, rotate=0.0, skew=0.0, scale=1.0):
 	"""
 	Returns an NSAffineTransform object for transforming layers.
@@ -83,8 +95,10 @@ class System7Shadow(FilterWithDialog):
 	@objc.python_method
 	def settings(self):
 		self.menuName = Glyphs.localize({
-			'en': u'System 7 Shadow',
-			'de': u'System-7-Schatten',
+			'en': 'System 7 Shadow',
+			'de': 'System-7-Schatten',
+			'fr': 'Ombre de Système 7',
+			'es': 'Ombra de la Sistema 7',
 		})
 		
 		# Word on Run Button (default: Apply)
@@ -151,15 +165,15 @@ class System7Shadow(FilterWithDialog):
 		keepSidebearings = 1
 		
 		# Called on font export, get value from customParameters
-		if customParameters.has_key('outlineX'):
+		if 'outlineX' in customParameters:
 			outlineX = customParameters['outlineX']
-		if customParameters.has_key('outlineY'):
+		if 'outlineY' in customParameters:
 			outlineY = customParameters['outlineY']
-		if customParameters.has_key('depthX'):
+		if 'depthX' in customParameters:
 			depthX = customParameters['depthX']
-		if customParameters.has_key('depthY'):
+		if 'depthY' in customParameters:
 			depthY = customParameters['depthY']
-		if customParameters.has_key('keepSidebearings'):
+		if 'keepSidebearings' in customParameters:
 			keepSidebearings = customParameters['keepSidebearings']
 		
 		# Called through UI, use stored value
@@ -182,7 +196,13 @@ class System7Shadow(FilterWithDialog):
 			mergeLayer.applyTransform(shiftMatrix)
 			for path in mergeLayer.paths:
 				mergePath = path.copy()
-				fatLayer.paths.append(mergePath)
+				try:
+					# GLYPHS 3
+					fatLayer.shapes.append(mergePath)
+				except:
+					# GLYPHS 2
+					fatLayer.paths.append(mergePath)
+				
 			fatLayer.removeOverlap()
 			fatLayer.cleanUpPaths()
 		
@@ -194,7 +214,13 @@ class System7Shadow(FilterWithDialog):
 		layer.cleanUpPaths()
 		
 		for fatPath in fatLayer.paths:
-			layer.paths.append(fatPath.copy())
+			try:
+				# GLYPHS 3
+				layer.shapes.append(fatPath.copy())
+			except:
+				# GLYPHS 2
+				layer.paths.append(fatPath.copy())
+			
 		
 		if keepSidebearings:
 			layer.LSB = originalLSB
