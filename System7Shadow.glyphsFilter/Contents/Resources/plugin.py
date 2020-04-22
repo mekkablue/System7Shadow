@@ -39,7 +39,7 @@ def offsetLayer( thisLayer, offsetX, offsetY, makeStroke=False, position=0.5, au
 		# GLYPHS 2:
 		offsetFilter.offsetLayer_offsetX_offsetY_makeStroke_autoStroke_position_error_shadow_(
 			thisLayer,
-			offset, offset, # horizontal and vertical offset
+			offsetX, offsetY, # horizontal and vertical offset
 			makeStroke,     # if True, creates a stroke
 			autoStroke,     # if True, distorts resulting shape to vertical metrics
 			position,       # stroke distribution to the left and right, 0.5 = middle
